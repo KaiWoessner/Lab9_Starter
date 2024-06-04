@@ -48,6 +48,14 @@
     }
   </style>
 </head>
+<script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+<script>
+  window.TrackJS && TrackJS.install({ 
+    token: "361eb0b7f63c4c19a511b351c7046fbd"
+    // for more configuration options, see https://docs.trackjs.com
+  });
+</script>
+                        
 
 <body>
   <main>
@@ -69,28 +77,48 @@
     </form>
 
     <section id="error-btns">
-      <button>Console Log</button>
-      <button>Console Error</button>
-      <button>Console Count</button>
-      <button>Console Warn</button>
-      <button>Console Assert</button>
-      <button>Console Clear</button>
-      <button>Console Dir</button>
-      <button>Console dirxml</button>
-      <button>Console Group Start</button>
-      <button>Console Group End</button>
-      <button>Console Table</button>
-      <button>Start Timer</button>
-      <button>End Timer</button>
-      <button>Console Trace</button>
-      <button>Trigger a Global Error</button>
+      <button id="log">Console Log</button>
+      <button id="err">Console Error</button>
+      <button id="count">Console Count</button>
+      <button id="warn">Console Warn</button>
+      <button id="assert">Console Assert</button>
+      <button id="clear">Console Clear</button>
+      <button id="dir">Console Dir</button>
+      <button id="dirxml">Console dirxml</button>
+      <button id="start">Console Group Start</button>
+      <button id="end">Console Group End</button>
+      <button id="table">Console Table</button>
+      <button id="stimer">Start Timer</button>
+      <button id="etimer">End Timer</button>
+      <button id="trace">Console Trace</button>
+      <button id="gerr">Trigger a Global Error</button>
     </section>
   </main>
 
   <script>
+    class BadError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "BadError";
+      }
+    }
+
     let form = document.querySelector('form');
+
     form.addEventListener('submit', e => {
       e.preventDefault();
+      let firstNumTest = document.querySelector('#first-num');
+      let secondNumTest = document.querySelector('#second-num');
+    
+
+      // Test form with my custom error
+      if (!(typeof firstNumTest === 'number')){
+        throw new BadError("First value not number");
+      }
+      if (!(typeof secondNumTest === 'number')){
+        throw new BadError("Second value not number");
+      }
+
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
@@ -102,6 +130,124 @@
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    let log = document.querySelector('#log');
+    log.addEventListener("click", () => {
+      TrackJS.track('Testing TrackJS!');
+      console.log("Hello world");
+    });
+
+    let err = document.querySelector('#err');
+    err.addEventListener("click", () => {
+      console.error("Error world");
+
+      try {
+        // Will fail to run and skip to catch
+        badFunction();
+      }
+      catch (err) {
+        console.error("CATCH: ", err);
+      }
+    });
+
+    let count = document.querySelector('#count');
+    count.addEventListener("click", () => {
+      console.count("Click Count");
+    });
+
+    let warn = document.querySelector('#warn');
+    warn.addEventListener("click", () => {
+      console.warn("Warning world")
+    });
+
+    let assert = document.querySelector('#assert');
+    assert.addEventListener("click", () => {
+      let a = 10;
+      let b = 5;
+      let reason = "expected a to equal b";
+      console.assert(a === b, {a,b, reason});
+    });
+
+    let clear = document.querySelector('#clear');
+    clear.addEventListener("click", () => {
+      console.clear();
+    });
+
+    let dir = document.querySelector('#dir');
+    dir.addEventListener("click", () => {
+
+      console.dir(dir);
+    });
+
+    let dirxml = document.querySelector('#dirxml');
+    dirxml.addEventListener("click", () => {
+      console.dirxml(dir);
+    });
+
+    let start = document.querySelector('#start');
+    start.addEventListener("click", () => {
+      console.group();
+    });
+
+    let end = document.querySelector('#end');
+    end.addEventListener("click", () => {
+      console.groupEnd();
+    });
+
+    let table = document.querySelector('#table');
+    table.addEventListener("click", () => {
+      const student = [
+      { fname: "Joe",
+        lname: "Montgomery",
+        pid: "1234"
+      },
+      { fname: "Madison",
+        lname: "White",
+        pid: "jh34"
+      },
+      { fname: "Bill",
+        pid: "87654"
+      }     
+      ];
+      console.table(student);
+    });
+
+    let stimer = document.querySelector('#stimer');
+    stimer.addEventListener("click", () => {
+      console.time();
+    });
+
+
+    let etimer = document.querySelector('#etimer');
+    etimer.addEventListener("click", () => {
+      console.timeEnd();
+    });
+
+    let trace = document.querySelector('#trace');
+    trace.addEventListener("click", () => {
+      const afunc = () => {
+        bfunc();
+      };
+      const bfunc = () => {
+        dfunc();
+      };
+      const cfunc = () => {
+        console.trace();
+      };
+      const dfunc = () => {
+        cfunc();
+      };
+      afunc();
+    });
+
+    let gerr = document.querySelector('#gerr');
+    gerr.addEventListener("click", () => {
+      window.onerror = () => {
+        console.log("Global Error: BAD");
+      }
+      iDontExist();
+    });
+
   </script>
 </body>
 
